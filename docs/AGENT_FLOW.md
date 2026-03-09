@@ -18,58 +18,50 @@ Its goal is to understand the client's idea and collect project requirements.
 flowchart TD
 
 A[Client Message]
+A --> B[API Route]
+B --> C[Message Processor]
+C --> D[Find or Create Customer]
+D --> E[Find or Create Conversation]
+E --> F[Save User Message]
+F --> G[Load Conversation History]
+G --> H[Extract Requirements]
+H --> I[Update Project Requirement Memory]
+I --> J[Detect Missing Fields]
+J --> K[Select Next Best Question]
+K --> L[Generate Natural Arabic Reply]
+L --> M[Save Assistant Message]
+M --> N[Return Response]
 
-A --> B[Message Understanding]
+---
 
-B --> C[Requirement Extraction]
+### What the Agent Stores
 
-C --> D[Update Project Memory]
+The system stores two kinds of information:
 
-D --> E[Detect Missing Information]
+## 1. Conversation Data
 
-E --> F[Select Next Question]
+customer
 
-F --> G[Generate Natural Arabic Reply]
+conversation
 
-G --> H[Return Response]
+messages
 
-```markdown
-## Agent Steps 
-
-Message Understanding
-
-Interpret the client message.
-
-Requirement Extraction
-
-Extract structured information such as:
+## 2. Structured Requirement Data
 
 project_type
 
-project_goal
+project_domain
+
+target_users
 
 platforms
 
-features
+main_features
 
 timeline
 
 budget
 
-Project Memory
+notes
 
-Save extracted information in conversation memory.
-
-Missing Information Detection
-
-Detect which fields are missing.
-
-Next Question Selection
-
-Choose the most important missing field.
-
-Reply Generation
-
-Generate a natural Arabic response.
-
-```
+raw_extraction
