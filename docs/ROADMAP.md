@@ -1,7 +1,12 @@
-# Roadmap
+# Product Roadmap
 
-## Phase 1
-Backend foundation
+Development plan for **AI Tawasol**.
+
+---
+
+# Phase 1 — Backend Foundation
+
+Core backend infrastructure.
 
 - FastAPI
 - PostgreSQL
@@ -10,16 +15,18 @@ Backend foundation
 
 ---
 
-## Phase 2
-AI integration
+# Phase 2 — AI Integration
 
-- Gemini connection
+Connecting the AI model.
+
+- Gemini API integration
 - dynamic responses
 
 ---
 
-## Phase 3
-Pre-Sales Intelligence
+# Phase 3 — Pre-Sales Intelligence
+
+Requirement discovery system.
 
 - requirements extraction
 - missing field detection
@@ -27,18 +34,20 @@ Pre-Sales Intelligence
 
 ---
 
-## Phase 4
-Project Structuring
+# Phase 4 — Project Structuring
 
-- store structured requirements
-- project summary generation
-- generate srs 
+Transform conversation into structured project data.
+
+- store requirements
+- generate project summary
+- generate SRS
 
 ---
 
-## Phase 5
-Integrations
+# Phase 5 — Integrations
+
+External communication channels.
 
 - website chat
-- telegram
-- whatsapp
+- Telegram
+- WhatsApp

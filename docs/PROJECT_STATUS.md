@@ -6,11 +6,13 @@
 ```markdown
 # Project Status
 
-Current stage: Backend foundation
+Current stage: **Backend Foundation**
 
 ---
 
-## Completed
+# Completed
+
+The following components are implemented:
 
 - FastAPI server
 - PostgreSQL with Docker
@@ -22,15 +24,15 @@ Current stage: Backend foundation
 
 ---
 
-## Working Now
+# Currently Working On
 
-- message endpoint
+- message endpoint logic
 - database connection
-- basic conversation logic
+- conversation handling
 
 ---
 
-## Next Steps
+# Next Steps
 
 1. Gemini integration
 2. requirements extraction

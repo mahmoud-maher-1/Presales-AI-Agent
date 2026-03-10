@@ -9,3 +9,8 @@ class MessageRequest(BaseModel):
 class MessageResponse(BaseModel):
     reply: str
     conversation_id: int
+    provider: str
+    requirements: dict
+    missing_fields: list[str]
+    state: str
+    completion_score: int

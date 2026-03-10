@@ -1,16 +1,19 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings:
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "postgresql+psycopg://postgres:postgres@localhost:5432/ai_tawasol",
+class Settings(BaseSettings):
+    DATABASE_URL: str
+
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash-lite"
+
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_MODEL: str = "deepseek/deepseek-chat-v3-0324:free"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",
     )
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-lite")
 
 
 settings = Settings()

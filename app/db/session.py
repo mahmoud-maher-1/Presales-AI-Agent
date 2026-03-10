@@ -9,4 +9,5 @@ class Base(DeclarativeBase):
 
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
+
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)

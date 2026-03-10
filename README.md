@@ -1,49 +1,77 @@
 # AI Tawasol
 
-AI Tawasol is an Arabic-first AI pre-sales agent for software houses and agencies.
+<p align="center">
+<strong>AI Tawasol</strong> is an Arabic-first AI pre-sales agent for software houses and agencies.
+</p>
 
-The system is designed to talk to potential clients, understand their project needs, ask about missing requirements, and gradually build a structured view of the project before handing it to the sales team.
+<p align="center">
+It talks to potential clients, understands their project needs, asks about missing requirements, and builds a structured view of the project before handing it to the sales team.
+</p>
 
 ---
 
-## Foundation v1:
+# Features
 
-We are building a text-only AI pre-sales core.
+* Arabic-first AI interaction
+* AI-driven requirement discovery
+* Structured project requirement extraction
+* Conversation memory management
+* Pre-sales intelligence workflow
+* Clean backend architecture
+
+---
+
+# Foundation v1
+
+We are building a **text-only AI pre-sales core**.
 
 The system manages:
 
-- customers
-- conversations
-- messages
-- projects
+* customers
+* conversations
+* messages
+* projects
 
-The system exposes one API that receives messages and returns AI responses.
-
-Scope of this phase:
-
-- text only
-- no dashboard
-- no external integrations
-- no audio
-
-Architecture:
-
-route -> message processor -> agent -> database
-
-## Tech Stack
-
-- Python
-- FastAPI
-- PostgreSQL
-- SQLAlchemy
-- Docker
-- Gemini API
+The system exposes **one API** that receives messages and returns AI responses.
 
 ---
 
-## Project Structure
+# Scope of this phase
 
-```text
+* text only
+* no dashboard
+* no external integrations
+* no audio
+
+---
+
+# Architecture
+
+```
+route → message processor → agent → database
+```
+
+More detailed architecture documentation:
+
+* docs/ARCHITECTURE.md
+* docs/AGENT_FLOW.md
+
+---
+
+# Tech Stack
+
+* Python
+* FastAPI
+* PostgreSQL
+* SQLAlchemy
+* Docker
+* Gemini API
+
+---
+
+# Project Structure
+
+```
 ai-tawasol
 │
 ├─ app
@@ -70,63 +98,187 @@ ai-tawasol
 ├─ docker-compose.yml
 ├─ requirements.txt
 └─ README.md
-
-
-```md
-## System Architecture
-
-![Architecture](docs/images/diagram.png)
-
-  ## Run Locally
-
-### 1. Start PostgreSQL
-
-```bash
- docker compose up -d 
-
-### 2 Activate virtual environment
-
-```bash
- .venv\Scripts\Activate.ps1
-
-### 3 Run the API
-
-```bash 
-uvicorn app.main:app --reload 
-### 4 Open docs
-
-```bash
-http://127.0.0.1:8000/docs   
-
-## API Documentation 
-
-![Swagger](docs/images/api-docs.png)
+```
 
 ---
 
+# System Architecture
 
-### Documentation
-More details inside the docs folder:
+![Architecture](docs/images/diagram.png)
 
-Architecture
+---
 
-Agent Flow
+# Agent Flow
 
-Project Status
+The AI agent behaves like a **pre-sales engineer**.
 
-Roadmap
+Its goal is to understand the client's idea and collect project requirements.
 
+Main pipeline:
 
-### Product Vision
+Client Message
+↓
+API Route
+↓
+Message Processor
+↓
+Requirement Extraction
+↓
+Missing Field Detection
+↓
+Next Question Engine
+↓
+AI Response
 
-## AI Tawasol is not a chatbot.
+Full documentation inside:
 
-It is an AI Pre-Sales Engineer that can:
+docs/AGENT_FLOW.md
 
-understand client requirements
+---
 
-detect missing information
+# Run Locally
 
-guide requirement discovery
+## 1 Start PostgreSQL
 
-prepare structured project details
+```bash
+docker compose up -d
+```
+
+---
+
+## 2 Activate virtual environment
+
+```bash
+.venv\Scripts\Activate.ps1
+```
+
+---
+
+## 3 Run the API
+
+```bash
+uvicorn app.main:app --reload
+```
+
+---
+
+## 4 Open API docs
+
+```
+http://127.0.0.1:8000/docs
+```
+
+---
+
+# API Example
+
+Example request:
+
+```
+POST /api/message
+```
+
+```json
+{
+ "customer_id": "123",
+ "message": "I want to build a mobile app"
+}
+```
+
+Example response:
+
+```json
+{
+ "reply": "Great. What type of app are you looking to build?"
+}
+```
+
+---
+
+# Documentation
+
+Full documentation inside the **docs folder**:
+
+* docs/ARCHITECTURE.md
+* docs/AGENT_FLOW.md
+* docs/PROJECT_STATUS.md
+* docs/ROADMAP.md
+
+---
+
+# Project Status
+
+Current stage: **Backend foundation**
+
+Completed:
+
+* FastAPI server
+* PostgreSQL with Docker
+* API endpoint `/api/message`
+* conversation storage
+* message storage
+* Swagger documentation
+* repository structure
+
+Currently working on:
+
+* message endpoint logic
+* database connection
+* conversation handling
+
+---
+
+# Roadmap
+
+### Phase 1
+
+Backend foundation
+
+* FastAPI
+* PostgreSQL
+* Docker
+* message endpoint
+
+### Phase 2
+
+AI integration
+
+* Gemini connection
+* dynamic responses
+
+### Phase 3
+
+Pre-Sales Intelligence
+
+* requirements extraction
+* missing field detection
+* next question generation
+
+### Phase 4
+
+Project Structuring
+
+* store structured requirements
+* project summary generation
+* generate SRS
+
+### Phase 5
+
+Integrations
+
+* website chat
+* telegram
+* whatsapp
+
+---
+
+# Product Vision
+
+## AI Tawasol is not a chatbot
+
+It is an **AI Pre-Sales Engineer** that can:
+
+* understand client requirements
+* detect missing information
+* guide requirement discovery
+* prepare structured project details
