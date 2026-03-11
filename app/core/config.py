@@ -5,10 +5,13 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.0-flash-lite"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
 
     OPENROUTER_API_KEY: str = ""
-    OPENROUTER_MODEL: str = "deepseek/deepseek-chat-v3-0324:free"
+    OPENROUTER_MODEL: str = "arcee-ai/trinity-large-preview:free "
+    
+    GROK_API_KEY: str = ""
+    GROK_MODEL: str = "grok-2-latest"
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -14,3 +14,8 @@ class MessageResponse(BaseModel):
     missing_fields: list[str]
     state: str
     completion_score: int
+
+
+class ProjectSummaryResponse(BaseModel):
+    conversation_id: int
+    summary: dict

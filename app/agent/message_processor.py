@@ -1,15 +1,19 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.agent.conversation_state import get_conversation_state
 from app.agent.presales_agent import PresalesAgent
-from app.models.customer import Customer
 from app.models.conversation import Conversation, ConversationStatus
+from app.models.customer import Customer
 from app.models.message import Message, MessageRole
 from app.models.project_requirement import ProjectRequirement
 
+
 def process_message(db: Session, customer_key: str, message: str) -> dict:
     # 1) find or create customer
-    customer = db.scalar(select(Customer).where(Customer.external_key == customer_key))
+    customer = db.scalar(
+        select(Customer).where(Customer.external_key == customer_key)
+    )
 
     if not customer:
         customer = Customer(external_key=customer_key)
@@ -47,7 +51,9 @@ def process_message(db: Session, customer_key: str, message: str) -> dict:
         .order_by(Message.id.asc())
     ).all()
 
-    history = "\n".join([f"{msg.role.value}: {msg.content}" for msg in messages])
+    history = "\n".join(
+        [f"{msg.role.value}: {msg.content}" for msg in messages]
+    )
 
     # 5) find or create requirement memory
     requirement_record = db.scalar(
@@ -57,19 +63,21 @@ def process_message(db: Session, customer_key: str, message: str) -> dict:
     )
 
     if not requirement_record:
-        requirement_record = ProjectRequirement(conversation_id=conversation.id)
+        requirement_record = ProjectRequirement(
+            conversation_id=conversation.id
+        )
         db.add(requirement_record)
         db.commit()
         db.refresh(requirement_record)
 
     # 6) run presales agent
     agent = PresalesAgent()
-    requirements, agent_reply, missing_fields, provider, state_info = agent.run(
-    message=message,
-    history=history,
-    requirement_record=requirement_record,
+    requirements, agent_reply, missing_fields, provider = agent.run(
+        message=message,
+        history=history,
+        requirement_record=requirement_record,
     )
-    
+
     # 7) update requirement memory
     if requirements.get("project_type"):
         requirement_record.project_type = requirements["project_type"]
@@ -96,8 +104,12 @@ def process_message(db: Session, customer_key: str, message: str) -> dict:
         requirement_record.raw_extraction = str(requirements)
 
     db.commit()
+    db.refresh(requirement_record)
 
-    # 8) save assistant message
+    # 8) calculate updated conversation state
+    state_info = get_conversation_state(requirement_record)
+
+    # 9) save assistant message
     assistant_message = Message(
         conversation_id=conversation.id,
         role=MessageRole.ASSISTANT,
@@ -105,6 +117,7 @@ def process_message(db: Session, customer_key: str, message: str) -> dict:
     )
     db.add(assistant_message)
     db.commit()
+
     return {
         "reply": agent_reply,
         "conversation_id": conversation.id,
