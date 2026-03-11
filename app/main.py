@@ -6,15 +6,21 @@ from fastapi.responses import FileResponse
 from app.api.message import router as message_router
 from app.api.summary import router as summary_router
 
+from app.db.session import engine
+from app.models import Base
+
 app = FastAPI(
     title="AI Tawasol",
     description="AI Presales Agent API",
     version="1.0"
 )
 
-# -------------------------
-# CORS (important for browser)
-# -------------------------
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,29 +29,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -------------------------
-# API Routers
-# -------------------------
 app.include_router(message_router, prefix="/api")
 app.include_router(summary_router, prefix="/api")
 
-# -------------------------
-# Static Files (frontend)
-# -------------------------
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
-# -------------------------
-# Chat UI
-# -------------------------
 @app.get("/chat")
 def chat_page():
     return FileResponse("app/static/chat.html")
 
 
-# -------------------------
-# Health Check
-# -------------------------
 @app.get("/")
 def root():
     return {
