@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
+from app.agent.summary_generator import generate_full_summary
 from app.db.deps import get_db
+from app.models.message import Message
 from app.models.project_requirement import ProjectRequirement
 
 router = APIRouter()
@@ -19,19 +21,25 @@ def get_conversation_summary(conversation_id: int, db: Session = Depends(get_db)
     if not requirement:
         return {
             "conversation_id": conversation_id,
-            "summary": None
+            "summary": None,
+            "kano_analysis": None,
         }
+
+    # Load conversation history for Kano analysis
+    messages = db.scalars(
+        select(Message)
+        .where(Message.conversation_id == conversation_id)
+        .order_by(Message.id.asc())
+    ).all()
+
+    history = "\n".join(
+        [f"{msg.role.value}: {msg.content}" for msg in messages]
+    )
+
+    result = generate_full_summary(requirement, history)
 
     return {
         "conversation_id": conversation_id,
-        "summary": {
-            "project_type": requirement.project_type,
-            "project_domain": requirement.project_domain,
-            "target_users": requirement.target_users,
-            "platforms": requirement.platforms,
-            "main_features": requirement.main_features,
-            "timeline": requirement.timeline,
-            "budget": requirement.budget,
-            "notes": requirement.notes
-        }
+        "summary": result["summary"],
+        "kano_analysis": result["kano_analysis"],
     }

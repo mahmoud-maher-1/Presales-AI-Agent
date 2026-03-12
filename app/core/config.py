@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = "arcee-ai/trinity-large-preview:free "
     
-    GROK_API_KEY: str = ""
-    GROK_MODEL: str = "grok-2-latest"
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "groq-2-latest"
 
     model_config = SettingsConfigDict(
         env_file=".env",

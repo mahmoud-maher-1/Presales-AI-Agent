@@ -3,8 +3,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.agent.message_processor import process_message
-from app.agent.summary_generator import generate_project_summary
+from app.agent.summary_generator import generate_full_summary
 from app.db.deps import get_db
+from app.models.message import Message
 from app.models.project_requirement import ProjectRequirement
 from app.schemas.message import (
     MessageRequest,
@@ -40,9 +41,21 @@ def get_project_summary(
     if not requirement:
         raise HTTPException(status_code=404, detail="Summary not found")
 
-    summary = generate_project_summary(requirement)
+    # Load conversation history for Kano analysis
+    messages = db.scalars(
+        select(Message)
+        .where(Message.conversation_id == conversation_id)
+        .order_by(Message.id.asc())
+    ).all()
+
+    history = "\n".join(
+        [f"{msg.role.value}: {msg.content}" for msg in messages]
+    )
+
+    result = generate_full_summary(requirement, history)
 
     return {
         "conversation_id": conversation_id,
-        "summary": summary,
+        "summary": result["summary"],
+        "kano_analysis": result["kano_analysis"],
     }

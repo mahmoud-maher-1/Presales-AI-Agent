@@ -2,19 +2,19 @@ import httpx
 from app.core.config import settings
 
 
-class GrokService:
+class GroqService:
     def __init__(self):
-        if not settings.GROK_API_KEY:
-            raise ValueError("GROK_API_KEY is missing")
+        if not settings.GROQ_API_KEY:
+            raise ValueError("GROQ_API_KEY is missing")
 
     def generate(self, prompt: str) -> str:
         headers = {
-            "Authorization": f"Bearer {settings.GROK_API_KEY}",
+            "Authorization": f"Bearer {settings.GROQ_API_KEY}",
             "Content-Type": "application/json",
         }
 
         payload = {
-            "model": settings.GROK_MODEL,
+            "model": settings.GROQ_MODEL,
             "messages": [
                 {
                     "role": "user",
@@ -24,14 +24,14 @@ class GrokService:
         }
 
         response = httpx.post(
-            "https://api.x.ai/v1/chat/completions",
+            "https://api.groq.com/openai/v1/chat/completions",
             headers=headers,
             json=payload,
             timeout=60.0,
         )
 
-        print("[Grok] status:", response.status_code)
-        print("[Grok] body:", response.text)
+        print("[Groq] status:", response.status_code)
+        print("[Groq] body:", response.text)
 
         response.raise_for_status()
         data = response.json()

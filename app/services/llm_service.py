@@ -1,6 +1,6 @@
 from app.services.gemini_service import GeminiService
 from app.services.openrouter_service import OpenRouterService
-from app.services.grok_service import GrokService
+from app.services.groq_service import GroqService
 
 
 def generate_ai_response(prompt: str) -> dict:
@@ -16,15 +16,15 @@ def generate_ai_response(prompt: str) -> dict:
         print(f"[LLM] Gemini failed: {repr(e)}")
 
     try:
-        grok = GrokService()
-        response = grok.generate(prompt)
-        print("[LLM] Provider: Grok")
+        groq = GroqService()
+        response = groq.generate(prompt)
+        print("[LLM] Provider: Groq")
         return {
-            "provider": "grok",
+            "provider": "groq",
             "text": response,
         }
     except Exception as e:
-        print(f"[LLM] Grok failed: {repr(e)}")
+        print(f"[LLM] Groq failed: {repr(e)}")
 
     try:
         openrouter = OpenRouterService()
@@ -39,5 +39,5 @@ def generate_ai_response(prompt: str) -> dict:
 
     return {
         "provider": "none",
-        "text": "عذرًا، خدمة الذكاء الاصطناعي غير متاحة حاليًا. حاول مرة أخرى بعد قليل.",
+        "text": "معلش، خدمة الذكاء الاصطناعي مش متاحة دلوقتي. جرب تاني بعد شوية.",
     }

@@ -14,7 +14,7 @@ def generate_next_question(requirement, history: str) -> tuple[str, list[str], s
 
     if not missing_fields:
         return (
-            "ممتاز، الصورة أصبحت أوضح الآن. هل تريد أن ألخص لك متطلبات المشروع الحالية بشكل منظم؟",
+            "تمام كده، الصورة بقت واضحة دلوقتي. عايز ألخصلك متطلبات المشروع بشكل منظم؟",
             [],
             "rule-based",
         )
@@ -32,6 +32,6 @@ def generate_next_question(requirement, history: str) -> tuple[str, list[str], s
     reply = result["text"].strip()
 
     if not reply:
-        reply = "هل يمكنك توضيح المزيد عن المشروع؟"
+        reply = "ممكن توضحلي أكتر عن المشروع؟"
 
     return reply, missing_fields, result["provider"]

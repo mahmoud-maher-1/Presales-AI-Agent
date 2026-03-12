@@ -16,6 +16,6 @@ class GeminiService:
                 model=settings.GEMINI_MODEL,
                 contents=prompt,
             )
-            return response.text or "عذرًا، لم أتمكن من توليد رد الآن."
+            return response.text or "معلش، مقدرتش أولّد رد دلوقتي."
         except errors.ClientError as e:
             raise RuntimeError(f"GEMINI_ERROR: {str(e)}") from e
