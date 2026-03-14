@@ -144,3 +144,117 @@ Rules:
 - Return at least the features that are clearly identifiable from the conversation
 - If no features can be identified, return an empty features array
 """
+
+
+def build_srs_generation_prompt(
+    requirement_summary: dict,
+    history: str,
+    lang: str = "en",
+) -> str:
+    import json
+    from datetime import date
+
+    today = date.today().isoformat()
+
+    lang_instruction = (
+        "Write the ENTIRE document in Modern Standard Arabic (فصحى). "
+        "All section titles, descriptions, and content must be in Arabic."
+        if lang == "ar"
+        else "Write the ENTIRE document in clear, professional English."
+    )
+
+    return f"""
+You are a senior software requirements engineer and technical documentation specialist.
+Your task is to produce a comprehensive Software Requirements Specification (SRS) document
+based on a client conversation transcript and the extracted project requirements.
+
+## Language
+
+{lang_instruction}
+
+## Context
+
+Extracted project requirements:
+{json.dumps(requirement_summary, ensure_ascii=False, indent=2)}
+
+Full conversation transcript:
+{history}
+
+## Your Task
+
+Analyze the conversation deeply. Go beyond what was explicitly stated — infer reasonable
+technical requirements, identify implicit needs, and provide thorough, actionable specifications.
+Each section must be HIGHLY DETAILED and INFORMATIVE.
+
+## Output Format
+
+Return ONLY valid JSON. No markdown. No extra text. Follow this exact schema:
+
+{{
+  "title": "Project name / title derived from the conversation",
+  "version": "1.0",
+  "date": "{today}",
+  "sections": {{
+    "introduction": {{
+      "purpose": "A thorough paragraph explaining why this SRS exists, who it is for, and what project it covers. Be specific to the project discussed.",
+      "scope": "Detailed description of what the software system will and will NOT do. Include boundaries, target market, and business goals inferred from the conversation.",
+      "definitions": [
+        {{"term": "Term name", "definition": "Clear definition relevant to this project"}}
+      ]
+    }},
+    "overall_description": {{
+      "product_perspective": "How this product fits within a larger system or ecosystem. Describe integrations, dependencies, and the operating context.",
+      "product_features": [
+        "Detailed description of feature 1 — include what it does, who uses it, and why it matters",
+        "Detailed description of feature 2 — same level of detail"
+      ],
+      "user_classes": [
+        {{"class": "User type name", "description": "Who they are, what they need, their technical level, how they interact with the system"}}
+      ],
+      "operating_environment": "Runtime, platforms, browsers, OS versions, hardware requirements — be specific based on what the client mentioned.",
+      "constraints": [
+        "Each constraint should be a full sentence explaining the limitation and its impact on design"
+      ],
+      "assumptions": [
+        "Each assumption should state what is being assumed and why it matters"
+      ]
+    }},
+    "functional_requirements": [
+      {{
+        "id": "FR-001",
+        "title": "Short descriptive title",
+        "description": "Detailed explanation of what the system must do. Include the trigger, input, processing logic, and expected output. Be thorough.",
+        "priority": "P0|P1|P2|P3",
+        "acceptance_criteria": [
+          "Given [precondition], when [action], then [expected result]",
+          "The system SHALL [specific measurable behavior]"
+        ]
+      }}
+    ],
+    "non_functional_requirements": [
+      {{
+        "id": "NFR-001",
+        "category": "performance|security|scalability|usability|reliability|maintainability",
+        "title": "Short descriptive title",
+        "description": "Detailed requirement with specific, measurable targets where possible (e.g., response time < 2s, 99.9% uptime)"
+      }}
+    ],
+    "constraints_and_assumptions": [
+      "Full-sentence descriptions of project constraints, technical limitations, and working assumptions"
+    ],
+    "acceptance_criteria_summary": "A detailed paragraph summarizing the overall acceptance criteria for the project. When would the client consider this project successfully delivered?"
+  }}
+}}
+
+## Rules
+- Extract as many functional requirements as possible from the conversation — aim for at least 5-10 distinct FRs
+- Include at least 3-5 non-functional requirements covering performance, security, and usability
+- Each requirement description must be at least 2-3 sentences long — avoid one-liners
+- Infer reasonable technical requirements even if the client didn't explicitly state them
+  (e.g., if they want a mobile app, infer push notifications, offline support, etc.)
+- Prioritize requirements logically: core functionality = P0, important features = P1, nice-to-have = P2, future = P3
+- The acceptance_criteria for each FR should be specific and testable
+- Include at least 3 definitions/terms relevant to the project domain
+- User classes should reflect all stakeholders mentioned or implied in the conversation
+- If the conversation is too short to generate a comprehensive SRS, still provide the best possible document with what is available
+"""

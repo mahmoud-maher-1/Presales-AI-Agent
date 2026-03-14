@@ -78,27 +78,40 @@ def process_message(db: Session, customer_key: str, message: str) -> dict:
         requirement_record=requirement_record,
     )
 
-    # 7) update requirement memory
+    # 7) update requirement memory — coerce values to strings for DB
+    def _to_str(val):
+        """Coerce LLM-extracted values to plain strings for Text/String columns."""
+        if val is None:
+            return None
+        if isinstance(val, str):
+            return val
+        if isinstance(val, list):
+            return ", ".join(str(item) for item in val)
+        if isinstance(val, dict):
+            import json
+            return json.dumps(val, ensure_ascii=False)
+        return str(val)
+
     if requirements.get("project_type"):
-        requirement_record.project_type = requirements["project_type"]
+        requirement_record.project_type = _to_str(requirements["project_type"])
 
     if requirements.get("project_domain"):
-        requirement_record.project_domain = requirements["project_domain"]
+        requirement_record.project_domain = _to_str(requirements["project_domain"])
 
     if requirements.get("target_users"):
-        requirement_record.target_users = requirements["target_users"]
+        requirement_record.target_users = _to_str(requirements["target_users"])
 
     if requirements.get("platforms"):
-        requirement_record.platforms = requirements["platforms"]
+        requirement_record.platforms = _to_str(requirements["platforms"])
 
     if requirements.get("main_features"):
-        requirement_record.main_features = requirements["main_features"]
+        requirement_record.main_features = _to_str(requirements["main_features"])
 
     if requirements.get("timeline"):
-        requirement_record.timeline = requirements["timeline"]
+        requirement_record.timeline = _to_str(requirements["timeline"])
 
     if requirements.get("budget"):
-        requirement_record.budget = requirements["budget"]
+        requirement_record.budget = _to_str(requirements["budget"])
 
     if requirements:
         requirement_record.raw_extraction = str(requirements)

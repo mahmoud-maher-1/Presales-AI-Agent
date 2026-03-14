@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 
 from app.api.message import router as message_router
 from app.api.summary import router as summary_router
+from app.api.pdf import router as pdf_router
 
 from app.db.session import engine
 from app.models import Base
@@ -31,6 +32,7 @@ app.add_middleware(
 
 app.include_router(message_router, prefix="/api")
 app.include_router(summary_router, prefix="/api")
+app.include_router(pdf_router, prefix="/api")
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 

@@ -20,3 +20,4 @@ class ProjectSummaryResponse(BaseModel):
     conversation_id: int
     summary: dict
     kano_analysis: dict | None = None
+    srs_document: dict | None = None

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -30,6 +30,7 @@ def send_message(
 )
 def get_project_summary(
     conversation_id: int,
+    lang: str = Query("en", pattern="^(en|ar)$"),
     db: Session = Depends(get_db),
 ):
     requirement = db.scalar(
@@ -41,7 +42,7 @@ def get_project_summary(
     if not requirement:
         raise HTTPException(status_code=404, detail="Summary not found")
 
-    # Load conversation history for Kano analysis
+    # Load conversation history for Kano analysis & SRS generation
     messages = db.scalars(
         select(Message)
         .where(Message.conversation_id == conversation_id)
@@ -52,10 +53,11 @@ def get_project_summary(
         [f"{msg.role.value}: {msg.content}" for msg in messages]
     )
 
-    result = generate_full_summary(requirement, history)
+    result = generate_full_summary(requirement, history, lang=lang)
 
     return {
         "conversation_id": conversation_id,
         "summary": result["summary"],
         "kano_analysis": result["kano_analysis"],
+        "srs_document": result["srs_document"],
     }

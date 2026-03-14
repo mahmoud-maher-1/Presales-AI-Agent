@@ -23,7 +23,8 @@ class OpenRouterService:
                     "role": "user",
                     "content": prompt
                 }
-            ]
+            ],
+            "max_tokens": 8192,
         }
 
         response = httpx.post(

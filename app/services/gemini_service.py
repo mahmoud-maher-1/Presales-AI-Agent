@@ -1,5 +1,5 @@
 from google import genai
-from google.genai import errors
+from google.genai import errors, types
 
 from app.core.config import settings
 
@@ -15,6 +15,9 @@ class GeminiService:
             response = self.client.models.generate_content(
                 model=settings.GEMINI_MODEL,
                 contents=prompt,
+                config=types.GenerateContentConfig(
+                    max_output_tokens=8192,
+                ),
             )
             return response.text or "معلش، مقدرتش أولّد رد دلوقتي."
         except errors.ClientError as e:
