@@ -15,18 +15,22 @@ Schema:
   "platforms": null,
   "main_features": null,
   "timeline": null,
-  "budget": null
+  "budget": null,
+  "notes": null
 }}
 
 Rules:
 - If the client mentions an app or تطبيق → project_type = "mobile_app"
-- If the client mentions website or موقع → project_type = "web_app"
+- If the client mentions website or موقع or ويب → project_type = "web_app"
 - If the project is about delivery or توصيل → project_domain = "delivery"
-- If the project is about ecommerce or متجر → project_domain = "ecommerce"
+- If the project is about ecommerce or متجر or store → project_domain = "ecommerce"
 - If the project is about booking or حجز → project_domain = "booking"
 - If the project is about education or تعليم → project_domain = "education"
 - If the project is about healthcare or عيادة or طبي → project_domain = "healthcare"
+- Extract concise notes if there is important context that does not fit clearly into the other fields
 - If a field is unknown return null
+- Keep values concise and structured
+- For main_features, return either a short string or an array of short features if clearly mentioned
 
 Conversation history:
 {history or ""}
@@ -34,18 +38,48 @@ Conversation history:
 Client message:
 {message}
 """
+
 def build_next_question_prompt(
     known: dict,
     missing: list[str],
     asked_topics: list[str],
     history: str,
+    stage: str = "discovery",
 ) -> str:
     import json
+
+    stage_instructions = {
+        "discovery": """
+You are in the early discovery stage.
+Ask the ONE question that will create the biggest improvement in understanding the project idea.
+Prefer broad, high-value questions that clarify the business direction, the main users, or the core use case.
+Do NOT sound robotic or like a checklist.
+""",
+        "clarification": """
+You already understand the project at a basic level.
+Ask the ONE question that clarifies the most important ambiguity in scope, workflow, users, or core features.
+Try to combine multiple missing details into one smart question when possible.
+Do NOT ask narrow form-like questions unless necessary.
+""",
+        "closing": """
+The conversation is near completion.
+Ask the ONE best closing-style question that helps conclude the conversation professionally.
+Prefer questions about timeline, budget, preferred next step, or confirmation of the understood scope.
+The tone should feel like a real pre-sales consultant closing the discussion naturally.
+""",
+    }
 
     return f"""
 You are an Egyptian Arabic AI pre-sales engineer for a software house.
 
-Your task is to ask the single best next question to understand the client's software project.
+Your goal is NOT just to fill fields.
+Your goal is to move the conversation forward in the smartest possible way and understand the project well enough for the company to act on it.
+
+Current stage:
+{stage}
+
+Stage guidance:
+{stage_instructions.get(stage, "")}
 
 Known information:
 {json.dumps(known, ensure_ascii=False, indent=2)}
@@ -64,12 +98,14 @@ Rules:
 - Ask only ONE question
 - Do not ask a generic question
 - Do not repeat a topic that was already discussed unless absolutely necessary
-- Ask about budget only after scope is reasonably clear
-- Choose the highest-value next question
-- Focus on clarifying project scope, users, platforms, features, timeline, and budget
-- Keep it concise and natural
+- Do not behave like a form or questionnaire
+- Prefer the question with the highest business value, not necessarily the first missing field
+- When possible, ask one smart question that reveals more than one thing
+- Ask about budget only when the project picture is reasonably clear
+- Keep it concise, natural, and human
+- Sound like an experienced pre-sales consultant
+- Do not list options unless they genuinely help move the discussion forward
 """
-
 
 def build_kano_classification_prompt(
     requirement_summary: dict,
@@ -84,22 +120,18 @@ discussed in a software project conversation using the Kano Model.
 ## Kano Model Categories
 
 1. **must_be** (Basic/Expected): Features the client considers essential. Their absence causes
-   strong dissatisfaction, but their presence is taken for granted. Look for phrases indicating
-   necessity, urgency, or non-negotiable requirements.
+   strong dissatisfaction, but their presence is taken for granted.
 
 2. **performance** (One-Dimensional): Features where more is better — satisfaction scales
-   proportionally with how well they are delivered. Look for phrases comparing quality levels
-   or expressing "the better X, the better."
+   proportionally with how well they are delivered.
 
 3. **attractive** (Delighters): Features that would pleasantly surprise the client. Their absence
-   does NOT cause dissatisfaction, but their presence creates excitement. Look for phrases like
-   "it would be nice if", "bonus", "if possible."
+   does NOT cause dissatisfaction, but their presence creates excitement.
 
 4. **indifferent**: Features mentioned in passing that the client does not seem to care strongly
-   about either way. Look for lack of emphasis or enthusiasm.
+   about either way.
 
 5. **reverse**: Features the client explicitly does NOT want or would be unhappy to see included.
-   Look for rejection, negative sentiment, or "please don't include."
 
 ## Input Data
 
@@ -113,8 +145,7 @@ Full conversation history:
 
 1. Read the FULL conversation history carefully.
 2. Identify every distinct feature, capability, or requirement mentioned by the client.
-3. Classify each feature into exactly ONE Kano category based on how the client described it
-   (tone, urgency, emphasis, language used).
+3. Classify each feature into exactly ONE Kano category based on how the client described it.
 4. Provide a brief reason for the classification.
 5. Generate a strategic recommendation summarizing what the development team should prioritize.
 
@@ -146,115 +177,139 @@ Rules:
 """
 
 
-def build_srs_generation_prompt(
+def build_swot_generation_prompt(
     requirement_summary: dict,
     history: str,
-    lang: str = "en",
+    lang: str = "ar",
 ) -> str:
     import json
-    from datetime import date
 
-    today = date.today().isoformat()
-
-    lang_instruction = (
-        "Write the ENTIRE document in Modern Standard Arabic (فصحى). "
-        "All section titles, descriptions, and content must be in Arabic."
+    language_instruction = (
+        "Return all text in Arabic."
         if lang == "ar"
-        else "Write the ENTIRE document in clear, professional English."
+        else "Return all text in English."
     )
 
     return f"""
-You are a senior software requirements engineer and technical documentation specialist.
-Your task is to produce a comprehensive Software Requirements Specification (SRS) document
-based on a client conversation transcript and the extracted project requirements.
+You are a senior product strategy consultant.
 
-## Language
+Your task is to generate a SWOT analysis for a software project opportunity
+based on the extracted requirements and the full customer conversation.
 
-{lang_instruction}
+{language_instruction}
 
 ## Context
 
 Extracted project requirements:
 {json.dumps(requirement_summary, ensure_ascii=False, indent=2)}
 
-Full conversation transcript:
+Full conversation history:
 {history}
 
 ## Your Task
 
-Analyze the conversation deeply. Go beyond what was explicitly stated — infer reasonable
-technical requirements, identify implicit needs, and provide thorough, actionable specifications.
-Each section must be HIGHLY DETAILED and INFORMATIVE.
+Analyze the project opportunity from a business and delivery perspective.
+
+Generate:
+- Strengths
+- Weaknesses
+- Opportunities
+- Threats
+- A practical recommendation for the software company
 
 ## Output Format
 
-Return ONLY valid JSON. No markdown. No extra text. Follow this exact schema:
+Return ONLY valid JSON. No markdown. No extra text.
+Use this exact schema:
 
 {{
-  "title": "Project name / title derived from the conversation",
-  "version": "1.0",
-  "date": "{today}",
-  "sections": {{
-    "introduction": {{
-      "purpose": "A thorough paragraph explaining why this SRS exists, who it is for, and what project it covers. Be specific to the project discussed.",
-      "scope": "Detailed description of what the software system will and will NOT do. Include boundaries, target market, and business goals inferred from the conversation.",
-      "definitions": [
-        {{"term": "Term name", "definition": "Clear definition relevant to this project"}}
-      ]
-    }},
-    "overall_description": {{
-      "product_perspective": "How this product fits within a larger system or ecosystem. Describe integrations, dependencies, and the operating context.",
-      "product_features": [
-        "Detailed description of feature 1 — include what it does, who uses it, and why it matters",
-        "Detailed description of feature 2 — same level of detail"
-      ],
-      "user_classes": [
-        {{"class": "User type name", "description": "Who they are, what they need, their technical level, how they interact with the system"}}
-      ],
-      "operating_environment": "Runtime, platforms, browsers, OS versions, hardware requirements — be specific based on what the client mentioned.",
-      "constraints": [
-        "Each constraint should be a full sentence explaining the limitation and its impact on design"
-      ],
-      "assumptions": [
-        "Each assumption should state what is being assumed and why it matters"
-      ]
-    }},
-    "functional_requirements": [
-      {{
-        "id": "FR-001",
-        "title": "Short descriptive title",
-        "description": "Detailed explanation of what the system must do. Include the trigger, input, processing logic, and expected output. Be thorough.",
-        "priority": "P0|P1|P2|P3",
-        "acceptance_criteria": [
-          "Given [precondition], when [action], then [expected result]",
-          "The system SHALL [specific measurable behavior]"
-        ]
-      }}
-    ],
-    "non_functional_requirements": [
-      {{
-        "id": "NFR-001",
-        "category": "performance|security|scalability|usability|reliability|maintainability",
-        "title": "Short descriptive title",
-        "description": "Detailed requirement with specific, measurable targets where possible (e.g., response time < 2s, 99.9% uptime)"
-      }}
-    ],
-    "constraints_and_assumptions": [
-      "Full-sentence descriptions of project constraints, technical limitations, and working assumptions"
-    ],
-    "acceptance_criteria_summary": "A detailed paragraph summarizing the overall acceptance criteria for the project. When would the client consider this project successfully delivered?"
-  }}
+  "strengths": [
+    "strength item 1",
+    "strength item 2"
+  ],
+  "weaknesses": [
+    "weakness item 1",
+    "weakness item 2"
+  ],
+  "opportunities": [
+    "opportunity item 1",
+    "opportunity item 2"
+  ],
+  "threats": [
+    "threat item 1",
+    "threat item 2"
+  ],
+  "recommendation": "A concise strategic recommendation"
 }}
 
-## Rules
-- Extract as many functional requirements as possible from the conversation — aim for at least 5-10 distinct FRs
-- Include at least 3-5 non-functional requirements covering performance, security, and usability
-- Each requirement description must be at least 2-3 sentences long — avoid one-liners
-- Infer reasonable technical requirements even if the client didn't explicitly state them
-  (e.g., if they want a mobile app, infer push notifications, offline support, etc.)
-- Prioritize requirements logically: core functionality = P0, important features = P1, nice-to-have = P2, future = P3
-- The acceptance_criteria for each FR should be specific and testable
-- Include at least 3 definitions/terms relevant to the project domain
-- User classes should reflect all stakeholders mentioned or implied in the conversation
-- If the conversation is too short to generate a comprehensive SRS, still provide the best possible document with what is available
+Rules:
+- Base the analysis on the customer's project idea and conversation context
+- Be realistic, not overly optimistic
+- Focus on software delivery, business fit, market clarity, scope clarity, and execution risk
+- Keep each item concise but meaningful
+- Return at least 2 items for each SWOT section when possible
+"""
+
+def build_activity_diagram_prompt(
+    requirement_summary: dict,
+    history: str,
+    lang: str = "ar",
+) -> str:
+    import json
+
+    language_instruction = (
+        "Use Arabic for the title, steps, and labels."
+        if lang == "ar"
+        else "Use English for the title, steps, and labels."
+    )
+
+    return f"""
+You are a senior business analyst and software solution architect.
+
+Your task is to generate an activity diagram for the proposed software system
+based on the extracted requirements and the full customer conversation.
+
+{language_instruction}
+
+## Context
+
+Extracted project requirements:
+{json.dumps(requirement_summary, ensure_ascii=False, indent=2)}
+
+Full conversation history:
+{history}
+
+## Your Task
+
+Analyze the project flow and identify the main user/system activities.
+
+Generate:
+1. A concise title for the diagram
+2. A Mermaid activity/flowchart diagram that represents the main business flow
+3. A short ordered list of the main steps in the flow
+
+## Output Format
+
+Return ONLY valid JSON. No markdown. No extra text.
+Use this exact schema:
+
+{{
+  "title": "Diagram title",
+  "diagram_type": "mermaid",
+  "mermaid": "flowchart TD\\nA[Start] --> B[Step 1] --> C[Step 2] --> D[End]",
+  "steps": [
+    "Step 1",
+    "Step 2",
+    "Step 3"
+  ]
+}}
+
+Rules:
+- Use Mermaid syntax in the "mermaid" field
+- Keep the flow clear and practical
+- Reflect the actual business flow implied by the conversation
+- Include key user roles or system actions when relevant
+- Do not overcomplicate the diagram
+- Prefer a business activity flow over low-level technical implementation details
+- The steps array must summarize the same flow shown in the Mermaid diagram
 """

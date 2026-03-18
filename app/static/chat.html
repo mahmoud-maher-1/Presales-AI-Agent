@@ -1,94 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
-<meta charset="UTF-8">
-<title>AI Tawasol Chat</title>
-
-<link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Tawasol Chat</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 
 <body>
-
-<div class="chat-container">
-
-<h2>
-<span>AI Tawasol Assistant</span>
-<button id="darkToggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
-</h2>
-
-<!-- Tab Bar -->
-<div class="tab-bar">
-  <button class="tab active" id="tabChat" onclick="showTab('chat')">💬 Chat</button>
-  <button class="tab" id="tabDownloads" onclick="showTab('downloads')">📥 Downloads</button>
-</div>
-
-<!-- Chat Tab -->
-<div id="chatTab" class="tab-content active">
-
-  <div id="chat"></div>
-
-  <div class="input-box">
-    <input id="messageInput" placeholder="اكتب رسالتك..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
-
-  <div class="summary-controls">
-    <button id="summaryBtn" class="locked" onclick="getSummary()" disabled>Generate Project Summary</button>
-
-    <div class="lang-toggle">
-      <button id="langToggle" onclick="toggleLang()" title="Switch language">
-        🌐 English
-      </button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Downloads Tab -->
-<div id="downloadsTab" class="tab-content">
-
-  <div id="downloadsLocked" class="downloads-locked">
-    <div class="locked-message">
-      <span class="locked-icon">🔒</span>
-      <p>Complete the conversation to unlock downloads</p>
-      <p class="locked-hint">Fill all core requirements (project type, domain, users, platforms) + at least one of: features, timeline, or budget</p>
-    </div>
-  </div>
-
-  <div id="downloadsReady" class="downloads-ready" style="display:none;">
-    <div class="download-card">
-      <div class="download-icon">📊</div>
-      <div class="download-info">
-        <h4>Kano Model Analysis</h4>
-        <p>Feature classification by customer satisfaction impact</p>
+  <div class="chat-container">
+    <h2>
+      <span>AI Tawasol Assistant</span>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button onclick="resetChat()" title="Start new chat">🔄 New Chat</button>
+        <button id="darkToggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
       </div>
-      <button onclick="downloadPDF('kano')">⬇ Download PDF</button>
+    </h2>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <button class="tab active" id="tabChat" onclick="showTab('chat')">💬 Chat</button>
+      <button class="tab" id="tabDownloads" onclick="showTab('downloads')">📥 Downloads</button>
     </div>
 
-    <div class="download-card">
-      <div class="download-icon">💬</div>
-      <div class="download-info">
-        <h4>Conversation History</h4>
-        <p>Full transcript of the requirements gathering session</p>
+    <!-- Chat Tab -->
+    <div id="chatTab" class="tab-content active">
+      <div id="chat"></div>
+
+      <div class="input-box">
+        <input id="messageInput" placeholder="اكتب رسالتك..." />
+        <button onclick="sendMessage()">Send</button>
       </div>
-      <button onclick="downloadPDF('history')">⬇ Download PDF</button>
+
+      <div class="summary-controls">
+        <button id="summaryBtn" class="locked" onclick="getSummary()" disabled>
+          Generate Project Summary
+        </button>
+
+        <div class="lang-toggle">
+          <button id="langToggle" onclick="toggleLang()" title="Switch language">
+            🌐 English
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="download-card">
-      <div class="download-icon">📄</div>
-      <div class="download-info">
-        <h4>SRS Document</h4>
-        <p>Comprehensive Software Requirements Specification</p>
+    <!-- Downloads Tab -->
+    <div id="downloadsTab" class="tab-content">
+      <div id="downloadsLocked" class="downloads-locked">
+        <div class="locked-message">
+          <span class="locked-icon">🔒</span>
+          <p>Complete the conversation to unlock downloads</p>
+          <p class="locked-hint">
+            Fill all core requirements (project type, domain, users, platforms)
+            + at least one of: features, timeline, or budget
+          </p>
+        </div>
       </div>
-      <button onclick="downloadPDF('srs')">⬇ Download PDF</button>
+
+      <div id="downloadsReady" class="downloads-ready" style="display:none;">
+        <div class="download-card">
+          <div class="download-icon">📝</div>
+          <div class="download-info">
+            <h4>Project Summary</h4>
+            <p>Structured overview of the project requirements</p>
+          </div>
+          <button onclick="downloadPDF('summary')">⬇ Download PDF</button>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">📈</div>
+          <div class="download-info">
+            <h4>SWOT Analysis</h4>
+            <p>Strengths, weaknesses, opportunities, and threats</p>
+          </div>
+          <button onclick="downloadPDF('swot')">⬇ Download PDF</button>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">🧭</div>
+          <div class="download-info">
+            <h4>Activity Diagram</h4>
+            <p>Business flow and system activity steps</p>
+          </div>
+          <button onclick="downloadPDF('activity')">⬇ Download PDF</button>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">📄</div>
+          <div class="download-info">
+            <h4>SRS Document</h4>
+            <p>Comprehensive Software Requirements Specification</p>
+          </div>
+          <button onclick="downloadPDF('srs')">⬇ Download PDF</button>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">📊</div>
+          <div class="download-info">
+            <h4>Kano Model Analysis</h4>
+            <p>Feature classification by customer satisfaction impact</p>
+          </div>
+          <button onclick="downloadPDF('kano')">⬇ Download PDF</button>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">💬</div>
+          <div class="download-info">
+            <h4>Conversation History</h4>
+            <p>Full transcript of the requirements gathering session</p>
+          </div>
+          <button onclick="downloadPDF('history')">⬇ Download PDF</button>
+        </div>
+      </div>
     </div>
   </div>
 
-</div>
-
-</div>
-
-<script src="/static/chat.js"></script>
-
+  <script src="/static/chat.js"></script>
 </body>
 </html>

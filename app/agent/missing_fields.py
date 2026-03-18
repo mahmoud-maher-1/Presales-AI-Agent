@@ -21,26 +21,33 @@ def is_missing(value) -> bool:
 
     return False
 
-def detect_missing_fields(requirement: ProjectRequirement) -> list[str]:
+
+def _get_value(requirement, field: str):
+    if isinstance(requirement, dict):
+        return requirement.get(field)
+    return getattr(requirement, field, None)
+
+
+def detect_missing_fields(requirement: ProjectRequirement | dict) -> list[str]:
     missing = []
 
     for field in FIELD_PRIORITY:
-        value = getattr(requirement, field, None)
+        value = _get_value(requirement, field)
         if is_missing(value):
             missing.append(field)
 
     return missing
 
 
-def build_known_requirements(requirement: ProjectRequirement) -> dict:
+def build_known_requirements(requirement: ProjectRequirement | dict) -> dict:
     return {
-        "project_type": requirement.project_type,
-        "project_domain": requirement.project_domain,
-        "target_users": requirement.target_users,
-        "platforms": requirement.platforms,
-        "main_features": requirement.main_features,
-        "timeline": requirement.timeline,
-        "budget": requirement.budget,
+        "project_type": _get_value(requirement, "project_type"),
+        "project_domain": _get_value(requirement, "project_domain"),
+        "target_users": _get_value(requirement, "target_users"),
+        "platforms": _get_value(requirement, "platforms"),
+        "main_features": _get_value(requirement, "main_features"),
+        "timeline": _get_value(requirement, "timeline"),
+        "budget": _get_value(requirement, "budget"),
     }
 
 
@@ -67,7 +74,7 @@ def extract_asked_topics(history: str) -> list[str]:
 
 
 def detect_missing_without_repetition(
-    requirement: ProjectRequirement,
+    requirement: ProjectRequirement | dict,
     history: str,
 ) -> tuple[list[str], list[str]]:
     missing = detect_missing_fields(requirement)

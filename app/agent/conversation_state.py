@@ -48,8 +48,12 @@ def get_conversation_state(requirement: ProjectRequirement) -> dict:
         fields["main_features"] or fields["timeline"] or fields["budget"]
     )
 
+    almost_ready_for_closing = core_ready and score >= 5
+
     if enough_for_summary:
         state = "ready_for_summary"
+    elif almost_ready_for_closing:
+        state = "ready_for_closing"
     elif score >= 2:
         state = "discovery_in_progress"
     else:
@@ -60,4 +64,7 @@ def get_conversation_state(requirement: ProjectRequirement) -> dict:
         "score": score,
         "total": result["total"],
         "fields": fields,
+        "core_ready": core_ready,
+        "enough_for_summary": enough_for_summary,
+        "almost_ready_for_closing": almost_ready_for_closing,
     }

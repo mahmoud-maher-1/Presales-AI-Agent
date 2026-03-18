@@ -1,142 +1,161 @@
 # AI Tawasol
 
-<p align="center">
-<strong>AI Tawasol</strong> is an Arabic-first AI pre-sales agent for software houses and agencies.
-</p>
+**AI Tawasol** is an AI-powered **Presales Engineer Assistant** designed to help software companies understand client needs, analyze project opportunities, and automatically generate technical documentation.
 
-<p align="center">
-It talks to potential clients, understands their project needs, asks about missing requirements, and builds a structured view of the project before handing it to the sales team.
-</p>
+Instead of manually conducting long discovery calls and writing technical documents, the system uses AI to guide conversations, extract requirements, and produce structured project analysis.
+
+AI Tawasol transforms early-stage client conversations into actionable technical insights.
 
 ---
 
-# Features
+# What Problem Does It Solve
 
-* Arabic-first AI interaction
-* AI-driven requirement discovery
-* Structured project requirement extraction
-* Conversation memory management
-* Pre-sales intelligence workflow
-* Clean backend architecture
+Software companies often spend significant time during the presales phase:
 
----
+* Understanding vague client ideas
+* Extracting structured requirements
+* Writing documentation
+* Evaluating project feasibility
 
-# Foundation v1
+AI Tawasol automates much of this process.
 
-We are building a **text-only AI pre-sales core**.
+The system behaves like an **AI Presales Engineer** that:
 
-The system manages:
-
-* customers
-* conversations
-* messages
-* projects
-
-The system exposes **one API** that receives messages and returns AI responses.
+* Asks intelligent discovery questions
+* Extracts project requirements
+* Analyzes the opportunity
+* Generates technical documentation automatically
 
 ---
 
-# Scope of this phase
+# Key Capabilities
 
-* text only
-* no dashboard
-* no external integrations
-* no audio
+## Intelligent Client Conversation
+
+AI Tawasol guides the conversation with the client to clarify the project idea and collect the most important information.
+
+## Requirement Extraction
+
+Automatically extracts structured project requirements including:
+
+* Project type
+* Target users
+* Platforms
+* Key features
+* Budget
+* Timeline
+
+## Lead Scoring
+
+Evaluates how promising a project opportunity is based on the conversation.
+
+## Kano Feature Analysis
+
+Classifies product features into Kano categories:
+
+* Must-be
+* Performance
+* Attractive
+* Indifferent
+* Reverse
+
+## SWOT Analysis
+
+Analyzes the project from a strategic perspective including strengths, weaknesses, opportunities, and risks.
+
+## Activity Diagram Generation
+
+Automatically generates a **Mermaid activity diagram** that describes the main business workflow.
+
+## SRS Document Generation
+
+Generates a full **Software Requirements Specification (SRS)** based on the client conversation.
+
+## PDF Report Generation
+
+Creates downloadable project reports for internal use or client proposals.
 
 ---
 
-# Architecture
+# System Architecture
 
+```mermaid
+flowchart TD
+
+Client --> ChatAPI
+ChatAPI --> MessageProcessor
+MessageProcessor --> RequirementExtractor
+RequirementExtractor --> LeadScoring
+
+LeadScoring --> NextQuestion
+NextQuestion --> ConversationLoop
+
+ConversationLoop --> ProjectAnalysis
+
+ProjectAnalysis --> Kano
+ProjectAnalysis --> SWOT
+ProjectAnalysis --> ActivityDiagram
+ProjectAnalysis --> SRS
+
+SRS --> PDFGenerator
 ```
-route → message processor → agent → database
-```
-
-More detailed architecture documentation:
-
-* docs/ARCHITECTURE.md
-* docs/AGENT_FLOW.md
 
 ---
 
-# Tech Stack
+# Technology Stack
 
-* Python
-* FastAPI
-* PostgreSQL
-* SQLAlchemy
-* Docker
-* Gemini API
+### Backend
+
+FastAPI
+Python
+
+### Database
+
+PostgreSQL
+SQLAlchemy
+Alembic
+
+### AI Providers
+
+Gemini
+OpenRouter
+Groq
+
+The system automatically falls back between providers if one fails.
+
+### Infrastructure
+
+Docker
+Docker Compose
 
 ---
 
 # Project Structure
 
 ```
-ai-tawasol
-│
-├─ app
-│  ├─ api
-│  ├─ core
-│  ├─ db
-│  ├─ models
-│  ├─ schemas
-│  ├─ services
-│  └─ main.py
-│
-├─ docs
-│  ├─ images
-│  │   ├─ api-docs.png
-│  │   ├─ architecture.png
-│  │   └─ agent-flow.png
-│  │
-│  ├─ ARCHITECTURE.md
-│  ├─ AGENT_FLOW.md
-│  ├─ PROJECT_STATUS.md
-│  └─ ROADMAP.md
-│
-├─ .env
-├─ docker-compose.yml
-├─ requirements.txt
-└─ README.md
+app/
+ ├ agent/        # AI reasoning modules
+ ├ api/          # REST API endpoints
+ ├ core/         # configuration
+ ├ db/           # database setup and migrations
+ ├ models/       # database models
+ ├ schemas/      # API schemas
+ ├ services/     # external services (LLM, PDF)
+ ├ static/       # simple chat interface
+ └ main.py       # FastAPI application entrypoint
+
+docs/
+ ├ AGENT_FLOW.md
+ ├ ARCHITECTURE.md
+ ├ DATABASE_SCHEMA.md
+ ├ PROJECT_STATUS.md
+ ├ ROADMAP.md
+ └ SRS.md
 ```
 
 ---
 
-# System Architecture
-
-![Architecture](docs/images/diagram.png)
-
----
-
-# Agent Flow
-
-The AI agent behaves like a **pre-sales engineer**.
-
-Its goal is to understand the client's idea and collect project requirements.
-
-Main pipeline:
-
-Client Message
-↓
-API Route
-↓
-Message Processor
-↓
-Requirement Extraction
-↓
-Missing Field Detection
-↓
-Next Question Engine
-↓
-AI Response
-
-Full documentation inside:
-
-docs/AGENT_FLOW.md
-
----
-
-# Run Locally
+# Running the Project Locally
 
 ## 1 Start PostgreSQL
 
@@ -162,7 +181,7 @@ uvicorn app.main:app --reload
 
 ---
 
-## 4 Open API docs
+## 4 Open the API documentation
 
 ```
 http://127.0.0.1:8000/docs
@@ -170,115 +189,60 @@ http://127.0.0.1:8000/docs
 
 ---
 
-# API Example
-
-Example request:
+## Open the Chat Interface
 
 ```
-POST /api/message
-```
-
-```json
-{
- "customer_id": "123",
- "message": "I want to build a mobile app"
-}
-```
-
-Example response:
-
-```json
-{
- "reply": "Great. What type of app are you looking to build?"
-}
+http://127.0.0.1:8000/chat
 ```
 
 ---
 
-# Documentation
+# Environment Variables
 
-Full documentation inside the **docs folder**:
+Create a `.env` file:
 
-* docs/ARCHITECTURE.md
-* docs/AGENT_FLOW.md
-* docs/PROJECT_STATUS.md
-* docs/ROADMAP.md
+```
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ai_tawasol
 
----
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
 
-# Project Status
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=arcee-ai/trinity-large-preview:free
 
-Current stage: **Backend foundation**
-
-Completed:
-
-* FastAPI server
-* PostgreSQL with Docker
-* API endpoint `/api/message`
-* conversation storage
-* message storage
-* Swagger documentation
-* repository structure
-
-Currently working on:
-
-* message endpoint logic
-* database connection
-* conversation handling
+GROQ_API_KEY=
+GROQ_MODEL=llama3-70b-8192
+```
 
 ---
 
-# Roadmap
+# Example Workflow
 
-### Phase 1
+1. A client describes a project idea.
+2. AI Tawasol asks discovery questions.
+3. The system extracts structured requirements.
+4. The project is analyzed using multiple frameworks.
+5. The system generates documentation including:
 
-Backend foundation
-
-* FastAPI
-* PostgreSQL
-* Docker
-* message endpoint
-
-### Phase 2
-
-AI integration
-
-* Gemini connection
-* dynamic responses
-
-### Phase 3
-
-Pre-Sales Intelligence
-
-* requirements extraction
-* missing field detection
-* next question generation
-
-### Phase 4
-
-Project Structuring
-
-* store structured requirements
-* project summary generation
-* generate SRS
-
-### Phase 5
-
-Integrations
-
-* website chat
-* telegram
-* whatsapp
+   * Project summary
+   * Kano analysis
+   * SWOT analysis
+   * Activity diagram
+   * SRS document
+6. A downloadable PDF report is generated.
 
 ---
 
-# Product Vision
+# Future Improvements
 
-## AI Tawasol is not a chatbot
+* AI-powered proposal generation
+* CRM integration
+* Architecture diagram generation
+* Knowledge base integration (RAG)
+* Lead management dashboard
 
-It is an **AI Pre-Sales Engineer** that can:
+---
 
-* understand client requirements
-* detect missing information
-* guide requirement discovery
-* prepare structured project details
+# License
+
+MIT License
