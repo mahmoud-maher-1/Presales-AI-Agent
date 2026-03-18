@@ -180,7 +180,7 @@ Rules:
 def build_swot_generation_prompt(
     requirement_summary: dict,
     history: str,
-    lang: str = "ar",
+    lang: str = "en",
 ) -> str:
     import json
 
