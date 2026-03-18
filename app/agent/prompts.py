@@ -253,14 +253,12 @@ Rules:
 def build_activity_diagram_prompt(
     requirement_summary: dict,
     history: str,
-    lang: str = "ar",
+    lang: str = "en",
 ) -> str:
     import json
 
-    language_instruction = (
-        "Use Arabic for the title, steps, and labels."
-        if lang == "ar"
-        else "Use English for the title, steps, and labels."
+    language_instruction = ( 
+      "Use English for the title, steps, and labels."
     )
 
     return f"""

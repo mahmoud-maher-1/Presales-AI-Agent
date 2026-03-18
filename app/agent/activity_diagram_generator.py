@@ -40,7 +40,7 @@ def extract_json(text: str) -> Optional[str]:
 def generate_activity_diagram(
     requirement: ProjectRequirement,
     history: str,
-    lang: str = "ar",
+    lang: str = "en",
 ) -> Optional[dict]:
     """
     Generate an activity diagram (Mermaid) from project requirements
