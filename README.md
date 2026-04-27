@@ -32,7 +32,7 @@ The system behaves like an **AI Presales Engineer** that:
 
 ## Intelligent Client Conversation
 
-AI Tawasol guides the conversation with the client to clarify the project idea and collect the most important information.
+AI Tawasol guides the conversation with the client to clarify the project idea and collect the most crucial and necessary information for further development.
 
 ## Requirement Extraction
 
